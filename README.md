@@ -1,159 +1,247 @@
-# Enhanced World Chat for AzerothCore
+# This is a module for ![logo](https://raw.githubusercontent.com/azerothcore/azerothcore.github.io/master/images/logo-github.png) AzerothCore
 
-A modern, feature-rich World Chat module for AzerothCore.
+# Enhanced World Chat
 
-Enhanced World Chat is a redesigned version of the original `mod-world-chat` by Ouizzy/Wizzymore. It keeps the simplicity of the original module while adding persistent World Chat mode, saved player preferences, flood protection, Blizzard-style hyperlinks, and configurable moderation tools.
 
-## Features
 
-- Cross-faction global chat
-- `.world <message>` command
-- Persistent World Chat Mode using `.world`
-- `.world on`, `.world off`, and `.world status`
-- Saved player settings between logins
-- Blizzard-style hyperlink support for items, spells, achievements, quests, professions, and more
-- Clean Blizzard-style formatting
-- GM announcement command
-- Horde-only and Alliance-only staff broadcasts
-- Minimum level requirement
-- Built-in flood protection
-- Optional `/join World` channel support
-- Fully configurable through `WorldChat.conf`
+---
 
-## Commands
+## Description
 
-### Player Commands
+**Enhanced World Chat** is a modern global chat module for AzerothCore designed to feel like a natural extension of Blizzard's chat system.
 
-```text
-.world <message>
-```
+Unlike traditional world chat modules, Enhanced World Chat includes persistent World Chat mode, Blizzard hyperlink support, configurable spam protection, duplicate detection, URL filtering, automatic Trade/LFG tagging, ignore-list integration, and a public API for other modules.
 
-Send a World Chat message.
+Everything is configurable through `WorldChat.conf`.
 
-```text
-.world
-```
+---
 
-Toggle persistent World Chat Mode.
+## Requirements
 
-```text
-.world on
-```
+Requires a current AzerothCore installation.
 
-Show World Chat.
+---
 
-```text
-.world off
-```
+# Features
 
-Hide World Chat.
+- Cross-faction World Chat
+- Persistent World Chat Mode (`.world`)
+- Saved player preferences
+- Join World Chat using `/join World`
+- Blizzard hyperlink support
+- Ignore list integration
+- Duplicate message detection
+- Flood protection
+- URL / advertising filter
+- Automatic Trade message detection
+- Automatic Dungeon Finder / Group detection
+- Horde-only broadcasts
+- Alliance-only broadcasts
+- GM announcements
+- Minimum player level
+- Configurable colors and tags
+- Full API for other modules
+- Lightweight with minimal overhead
 
-```text
-.world status
-```
+---
 
-Display current World Chat settings.
+# Commands
 
-### Staff Commands
+## Player Commands
 
-```text
-.worldgm <message>
-```
+| Command | Description |
+|---------|-------------|
+| `.world <message>` | Send a World Chat message |
+| `.world` | Toggle World Chat Mode |
+| `.world on` | Enable World Chat |
+| `.world off` | Disable World Chat |
+| `.world status` | Display current World Chat settings |
+| `/join World` | Join World Chat like a normal channel |
 
-Broadcast a server-wide announcement.
+---
 
-```text
-.worldh <message>
-```
+## Staff Commands
 
-Send a Horde-only World Chat message.
+| Command | Description |
+|---------|-------------|
+| `.worldgm <message>` | Broadcast a server announcement |
+| `.worldh <message>` | Horde-only World Chat |
+| `.worlda <message>` | Alliance-only World Chat |
 
-```text
-.worlda <message>
-```
+Staff members always receive faction-restricted messages to simplify moderation.
 
-Send an Alliance-only World Chat message.
+---
+
+# Advanced Features
 
 ## Persistent World Chat Mode
 
-Typing:
+Simply type:
 
 ```text
 .world
 ```
 
-toggles World Chat Mode.
+Every normal `/say` message will now be redirected into World Chat until disabled.
 
-When enabled, normal `/say` messages are redirected to World Chat until the player toggles it off again.
+---
 
 ## Hyperlink Support
 
-Enhanced World Chat preserves normal WoW chat hyperlinks.
+Enhanced World Chat preserves Blizzard hyperlinks.
 
-Players can shift-click items, spells, achievements, quests, professions, and other supported links directly into World Chat.
+Supports:
+
+- Items
+- Spells
+- Achievements
+- Quests
+- Enchants
+- Glyphs
+- Recipes
+- Player Links
+
+Players can Shift-Click links exactly as they would in normal chat.
+
+---
+
+## Automatic Chat Detection
+
+Trade messages are automatically tagged.
 
 Example:
 
 ```text
-.world WTS [Betrayer of Humanity]
+[Trade] Ariot: WTS [Betrayer of Humanity]
 ```
 
-## Flood Protection
+Group finder messages are automatically detected.
 
-Enhanced World Chat includes configurable anti-spam protection.
+Example:
 
-```ini
-WorldChat.Flood.WindowSeconds = 10
-WorldChat.Flood.WarnCount = 3
-WorldChat.Flood.MuteCount = 5
-WorldChat.Flood.MuteSeconds = 60
+```text
+[Group] Ariot: LFM ICC 25 Need Healer
 ```
 
-## Configuration
+Both features can be enabled or disabled independently.
+
+---
+
+## Spam Protection
+
+Built-in flood protection includes:
+
+- Configurable warning threshold
+- Temporary automatic mute
+- Duplicate message detection
+- URL / advertising blocking
+
+GM accounts are automatically exempt.
+
+---
+
+## Ignore Support
+
+Enhanced World Chat respects the normal Blizzard ignore list.
+
+If a player is ignored, their World Chat messages are hidden automatically.
+
+---
+
+## Public API
+
+Other AzerothCore modules can broadcast through World Chat.
+
+Examples:
+
+```cpp
+WC::Broadcast("Server restart in 10 minutes.");
+
+WC::Broadcast(WC::MessageChannel::Announcement,
+              "Icecrown Citadel is now open!");
+
+WC::Broadcast(WC::MessageChannel::Trade,
+              "Auction House weekend has begun.");
+
+WC::Broadcast(WC::MessageChannel::Group,
+              "Dungeon Bonus Event is active.");
+
+WC::SendToPlayer(player,
+                 WC::MessageChannel::Announcement,
+                 "Your companion has gained a level.");
+
+WC::SendToFaction(TEAM_HORDE,
+                  WC::MessageChannel::Announcement,
+                  "Wintergrasp begins in 10 minutes.");
+
+WC::SendToGMs(WC::MessageChannel::GM,
+              "AntiCheat detected suspicious movement.");
+```
+
+---
+
+# Configuration
+
+Every feature can be enabled or disabled.
+
+Examples:
 
 ```ini
 WorldChat.Enable = 1
 WorldChat.CrossFaction = 1
-WorldChat.Announce = 0
-WorldChat.ChannelName = "world"
-WorldChat.OnLogin.State = 1
-WorldChat.Tag = "[World]"
+
+WorldChat.IgnoreSupport = 1
+
+WorldChat.DuplicateDetection = 1
+WorldChat.UrlFilter = 1
+
+WorldChat.TradeDetection = 1
+WorldChat.GroupDetection = 1
 
 WorldChat.MinimumLevel = 10
-
-WorldChat.Flood.WindowSeconds = 10
-WorldChat.Flood.WarnCount = 3
-WorldChat.Flood.MuteCount = 5
-WorldChat.Flood.MuteSeconds = 60
 ```
 
-## Installation
+---
 
-1. Copy the module into the AzerothCore `modules` directory.
-2. Re-run CMake.
-3. Compile the server.
-4. Import the character database SQL from:
+# Installation
 
-```text
-sql/characters/base/
 ```
-
-5. Copy `WorldChat.conf.dist` into your server configuration directory.
+1. Place the module inside the AzerothCore modules directory.
+2. Import the SQL into the Characters database.
+3. Re-run CMake.
+4. Compile AzerothCore.
+5. Copy WorldChat.conf.dist to your configuration folder.
 6. Restart the server.
+```
 
-## Credits
+---
 
-Enhanced World Chat is based on the original `mod-world-chat` project created by Ouizzy/Wizzymore.
+# Why Enhanced World Chat?
 
-This version expands the original concept with persistent player preferences, persistent World Chat mode, improved formatting, hyperlink support, flood protection, and configurable moderation tools.
+Enhanced World Chat was designed with two goals:
 
-Special thanks to the AzerothCore community for the foundation that made this module possible.
+- Feel like Blizzard built it.
+- Be easy for server owners to configure.
 
-## Planned Features
+Rather than simply forwarding chat messages, it provides a complete communication framework that other AzerothCore modules can use through its public API.
 
-- Ignore list integration
-- Optional chat history
-- Optional Discord relay support
-- Optional chat logging database
-- Localized system messages
-- Broadcast API for other modules
+---
+
+# Credits
+
+Original World Chat concept:
+
+- Ouizzy
+- Wizzymore
+
+Enhanced World Chat:
+
+- Expanded and modernized with persistent chat mode, API support, hyperlink preservation, ignore integration, automatic message classification, configurable filtering, and moderation tools.
+
+Special thanks to the AzerothCore community for providing the foundation that makes modules like this possible.
+
+---
+
+# License
+
+GNU AGPL v3
